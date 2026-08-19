@@ -1,27 +1,44 @@
-import Header from './components/Header'
-import Hero from './components/Hero'
-import Credenciais from './components/Credenciais'
-import Trajetoria from './components/Trajetoria'
-import Pautas from './components/Pautas'
-import Realizacoes from './components/Realizacoes'
-import Contato from './components/Contato'
-import Footer from './components/Footer'
-import WhatsAppFloat from './components/WhatsAppFloat'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import Cabecalho from './components/Cabecalho'
+import Rodape from './components/Rodape'
+import Inicio from './pages/Inicio'
+import Biografia from './pages/Biografia'
+import Atuacao from './pages/Atuacao'
+import Destaques from './pages/Destaques'
+import DestaqueDetalhe from './pages/DestaqueDetalhe'
+import Contato from './pages/Contato'
+
+function AoTrocarDeRota() {
+  const { pathname, hash } = useLocation()
+  useEffect(() => {
+    if (hash) {
+      const alvo = document.getElementById(hash.slice(1))
+      if (alvo) { alvo.scrollIntoView(); return }
+    }
+    window.scrollTo(0, 0)
+  }, [pathname, hash])
+  return null
+}
 
 export default function App() {
   return (
     <>
-      <Header />
-      <main>
-        <Hero />
-        <Credenciais />
-        <Trajetoria />
-        <Pautas />
-        <Realizacoes />
-        <Contato />
+      <a className="pular-para-conteudo" href="#conteudo">Pular para o conteúdo</a>
+      <AoTrocarDeRota />
+      <Cabecalho />
+      <main id="conteudo">
+        <Routes>
+          <Route path="/" element={<Inicio />} />
+          <Route path="/biografia" element={<Biografia />} />
+          <Route path="/atuacao" element={<Atuacao />} />
+          <Route path="/destaques" element={<Destaques />} />
+          <Route path="/destaques/:slug" element={<DestaqueDetalhe />} />
+          <Route path="/contato" element={<Contato />} />
+          <Route path="*" element={<Inicio />} />
+        </Routes>
       </main>
-      <Footer />
-      <WhatsAppFloat />
+      <Rodape />
     </>
   )
 }

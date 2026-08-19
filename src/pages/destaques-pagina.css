@@ -1,0 +1,39 @@
+.filtro { display: flex; flex-wrap: wrap; gap: var(--e-2); margin-bottom: var(--e-16); }
+.filtro__item {
+  background: none;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-botao);
+  padding: var(--e-2) var(--e-4);
+  font-size: 0.875rem;
+  color: var(--grafite);
+  cursor: pointer;
+  transition: border-color var(--transicao), color var(--transicao), background-color var(--transicao);
+}
+.filtro__item:hover { border-color: var(--azul-500); color: var(--azul-900); }
+.filtro__item.ativo { background: var(--azul-700); border-color: var(--azul-700); color: var(--creme); }
+
+.semanas { display: grid; gap: var(--e-24); }
+
+.semana { display: grid; gap: var(--e-8); }
+.semana__titulo {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--azul-900);
+  padding-bottom: var(--e-3);
+  border-bottom: 1px solid var(--linha);
+}
+.semana__itens { display: grid; gap: var(--e-12); }
+
+@media (min-width: 64rem) {
+  .semana { grid-template-columns: 3fr 9fr; gap: var(--e-8); align-items: start; }
+  .semana__titulo {
+    position: sticky;
+    top: 112px;
+    border-bottom: 0;
+    border-left: 2px solid var(--acento);
+    padding: 0 0 0 var(--e-4);
+    font-family: var(--serifa);
+    font-size: 1.375rem;
+  }
+  .semana__itens { grid-template-columns: repeat(2, 1fr); gap: var(--e-12); }
+}

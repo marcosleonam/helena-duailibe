@@ -1,0 +1,40 @@
+.citacao {
+  background: var(--azul-700);
+  color: var(--creme);
+  margin: 0;
+  padding-block: var(--e-24);
+}
+.citacao__interno { max-width: 62rem; }
+
+.citacao__texto {
+  position: relative;
+  margin: 0;
+  font-family: var(--serifa);
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2rem);
+  line-height: 1.35;
+  font-style: italic;
+  font-weight: 400;
+  padding-top: var(--e-12);
+}
+.citacao__texto::before {
+  content: "“";
+  position: absolute;
+  top: -0.15em;
+  left: -0.05em;
+  font-size: 6rem;
+  line-height: 1;
+  color: var(--acento);
+  font-style: normal;
+}
+
+.citacao__autoria {
+  margin-top: var(--e-8);
+  display: grid;
+  gap: var(--e-1);
+  font-size: var(--t-rotulo);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(250, 248, 244, 0.8);
+}
+.citacao__fonte { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: var(--t-meta); color: rgba(250, 248, 244, 0.55); }

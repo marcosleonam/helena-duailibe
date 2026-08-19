@@ -1,0 +1,50 @@
+name: Sincronizar destaques do Instagram
+
+on:
+  schedule:
+    # toda segunda-feira, 09h de Brasília (12h UTC)
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Buscar publicações e gravar o JSON
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: node scripts/sync-instagram.mjs
+
+      - name: Publicar alterações
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/destaques.json public/img/destaques
+          if git diff --staged --quiet; then
+            echo "Nada novo para publicar."
+          else
+            git commit -m "chore: atualiza destaques da semana"
+            git push
+          fi
+
+      - name: Abrir issue se a sincronização falhar
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "Sincronização do Instagram falhou",
+              body: "A rotina semanal de destaques falhou. Verifique se o IG_ACCESS_TOKEN ainda é válido e rode o workflow manualmente em Actions. Enquanto isso, a assessoria pode publicar destaques editando public/data/destaques.json à mão (instruções no README)."
+            })
