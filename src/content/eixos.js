@@ -60,13 +60,12 @@ export const eixos = [
       'Microcrédito para pequenos empreendedores, valorização das tradições populares do interior e preservação da água.',
     paragrafos: [
       'No discurso de julho de 2025, destacou o acordo de cooperação técnica entre o Governo do Estado, a FAMEM e o Banco do Nordeste para ampliar o acesso ao microcrédito de pequenos empreendedores, além da valorização das tradições populares e dos eventos religiosos do interior do estado.',
-      'Promoveu na Assembleia Legislativa um seminário sobre a importância da preservação da água.',
+      'Em março de 2026, promoveu no auditório Gervásio Santos, na Assembleia Legislativa, um seminário sobre a importância da preservação da água, em alusão ao Dia Mundial da Água, com a proposta de criação de um Fórum Permanente de Recursos Hídricos.',
     ],
     fonte: {
-      texto: 'Discurso na Assembleia Legislativa do Maranhão, 8/7/2025',
-      url: 'https://www.al.ma.leg.br/sitealema/deputado/dra-helena-duailibe/',
+      texto: 'Zeca Soares, 31/3/2026, e discurso na Assembleia Legislativa, 8/7/2025',
+      url: 'https://www.zecasoares.com/2026/03/31/helena-duailibe-promove-seminario-sobre-a-importancia-da-agua/',
     },
-    confirmar: 'Data do seminário sobre preservação da água.',
     pendente: false,
   },
 ]

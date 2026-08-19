@@ -84,6 +84,7 @@ Todo o conteúdo editorial está em `src/content/`, separado do layout:
 | `credenciais.js` | a faixa de três fatos da home |
 | `biografia.js` | a página *Quem é* |
 | `eixos.js` | os quatro eixos de atuação e suas fontes |
+| `imprensa.js` | o clipping da página *Na imprensa* (só entra matéria com link real) |
 
 ## Pendências com a assessoria
 
@@ -100,7 +101,6 @@ o site mostra `[CONFIRMAR]` ou omite o elemento.
 - [ ] **Eixo 3** — autoria da ferramenta eletrônica de avaliação de risco de
       violência contra a mulher aprovada na ALEMA. **Não publicar sem confirmação
       do gabinete**: as buscas associaram o tema a outros parlamentares.
-- [ ] **Eixo 4** — data do seminário sobre preservação da água.
 - [ ] **Formulário de contato**: criar o endpoint no Formspree ou Web3Forms e
       colar em `ENDPOINT`, no topo de `src/pages/Contato.jsx`. Enquanto estiver
       vazio, o formulário valida os campos e orienta o contato por e-mail em vez

@@ -9,8 +9,10 @@ import Fonte from '../components/Fonte'
 import { perfil, posicionamento } from '../content/perfil'
 import { credenciais } from '../content/credenciais'
 import { eixos } from '../content/eixos'
+import { imprensa } from '../content/imprensa'
 import { useDestaques, semanaPorExtenso } from '../hooks/useDestaques'
 import './inicio.css'
+import './imprensa.css'
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -137,36 +139,29 @@ export default function Inicio() {
 
       <Citacao texto={posicionamento.texto} autoria={posicionamento.autoria} />
 
-      {/* Instagram */}
-      <section className="secao bloco-gelo" aria-labelledby="titulo-instagram"><div className="container">
+      {/* Na imprensa */}
+      <section className="secao bloco-gelo" aria-labelledby="titulo-imprensa"><div className="container">
         <Revelar>
-          <RotuloSecao>Redes</RotuloSecao>
+          <RotuloSecao>Na imprensa</RotuloSecao>
           <div className="secao__cabecalho">
-            <h2 id="titulo-instagram" className="secao__titulo">Acompanhe o dia a dia do mandato</h2>
+            <h2 id="titulo-imprensa" className="secao__titulo">O que dizem sobre o mandato</h2>
+            <Link className="secao__atalho" to="/imprensa">Todas as matérias →</Link>
           </div>
         </Revelar>
 
-        {recentes.length > 0 && (
-          <div className="miniaturas" style={{ gridTemplateColumns: `repeat(${Math.min(recentes.length, 3)}, 1fr)` }}>
-            {recentes.map((item) => (
-              <a
-                key={item.id}
-                className="miniatura"
-                href={item.permalink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  src={`${import.meta.env.BASE_URL}${(item.imagem || '').replace(/^\//, '')}`}
-                  alt={item.titulo}
-                  width={400}
-                  height={400}
-                  loading="lazy"
-                />
-              </a>
-            ))}
-          </div>
-        )}
+        <ul className="imprensa-home">
+          {imprensa.slice(0, 3).map((item) => (
+            <li key={item.url} className="imprensa-home__item">
+              <div className="imprensa-home__meta">
+                <span className="clipping__veiculo">{item.veiculo}</span>
+                <span className="clipping__data">{item.data}</span>
+              </div>
+              <h3 className="imprensa-home__titulo">
+                <a href={item.url} target="_blank" rel="noopener noreferrer">{item.titulo}</a>
+              </h3>
+            </li>
+          ))}
+        </ul>
 
         <div className="instagram__chamada">
           <p className="instagram__arroba">{perfil.arroba}</p>
@@ -174,6 +169,7 @@ export default function Inicio() {
         </div>
        </div>
       </section>
+
     </>
   )
 }

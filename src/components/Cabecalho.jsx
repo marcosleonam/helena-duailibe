@@ -7,6 +7,7 @@ const NAV = [
   { para: '/biografia', rotulo: 'Quem é' },
   { para: '/atuacao', rotulo: 'Atuação' },
   { para: '/destaques', rotulo: 'Destaques' },
+  { para: '/imprensa', rotulo: 'Imprensa' },
   { para: '/contato', rotulo: 'Contato' },
 ]
 

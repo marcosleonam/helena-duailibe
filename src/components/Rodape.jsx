@@ -24,6 +24,7 @@ export default function Rodape() {
               <li><Link to="/biografia">Quem é a Dra. Helena</Link></li>
               <li><Link to="/atuacao">Atuação parlamentar</Link></li>
               <li><Link to="/destaques">Destaques da semana</Link></li>
+              <li><Link to="/imprensa">Na imprensa</Link></li>
               <li><Link to="/contato">Contato e gabinete</Link></li>
             </ul>
           </div>
