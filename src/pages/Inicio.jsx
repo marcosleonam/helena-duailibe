@@ -140,7 +140,7 @@ export default function Inicio() {
         </Revelar>
 
         {recentes.length > 0 && (
-          <div className="miniaturas">
+          <div className="miniaturas" style={{ gridTemplateColumns: `repeat(${Math.min(recentes.length, 3)}, 1fr)` }}>
             {recentes.map((item) => (
               <a
                 key={item.id}
