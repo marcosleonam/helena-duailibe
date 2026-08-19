@@ -1,20 +1,23 @@
 /**
  * Pós-build:
- *  1. copia dist/index.html para dist/404.html — o GitHub Pages devolve o 404
- *     em rotas desconhecidas, e como ele é o mesmo shell do SPA, /destaques/xxx
- *     funciona com refresh direto;
- *  2. gera o sitemap.xml com as rotas fixas + os destaques do JSON.
+ *  1. copia dist/index.html para dist/404.html — rede de segurança do SPA;
+ *  2. cria uma cópia do index em cada rota (/biografia/index.html, e uma por
+ *     destaque) para que o refresh direto responda 200, e não 404 servido pelo
+ *     fallback do GitHub Pages — o que estragaria SEO e sitemap;
+ *  3. gera sitemap.xml com as rotas fixas + os destaques do JSON;
+ *  4. escreve um .htaccess para quando o site migrar para hospedagem própria.
  */
-import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync } from 'node:fs'
+import { resolve, dirname } from 'node:path'
 
 const raiz = resolve(import.meta.dirname, '..')
 const dist = resolve(raiz, 'dist')
 const SITE = 'https://marcosleonam.github.io/helena-duailibe'
 
-copyFileSync(resolve(dist, 'index.html'), resolve(dist, '404.html'))
+const indexHtml = resolve(dist, 'index.html')
+copyFileSync(indexHtml, resolve(dist, '404.html'))
 
-const rotas = ['/', '/biografia', '/atuacao', '/destaques', '/contato']
+const rotas = ['/biografia', '/atuacao', '/destaques', '/contato']
 
 const arquivoDestaques = resolve(dist, 'data/destaques.json')
 if (existsSync(arquivoDestaques)) {
@@ -24,12 +27,33 @@ if (existsSync(arquivoDestaques)) {
   }
 }
 
+for (const rota of rotas) {
+  const destino = resolve(dist, `.${rota}/index.html`)
+  mkdirSync(dirname(destino), { recursive: true })
+  copyFileSync(indexHtml, destino)
+}
+
 const hoje = new Date().toISOString().slice(0, 10)
+const todas = ['/', ...rotas]
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${rotas.map((r) => `  <url>\n    <loc>${SITE}${r}</loc>\n    <lastmod>${hoje}</lastmod>\n  </url>`).join('\n')}
+${todas.map((r) => `  <url>\n    <loc>${SITE}${r}</loc>\n    <lastmod>${hoje}</lastmod>\n  </url>`).join('\n')}
 </urlset>
 `
 writeFileSync(resolve(dist, 'sitemap.xml'), xml)
 
-console.log(`pos-build: 404.html criado e sitemap.xml com ${rotas.length} rotas`)
+// Hospedagem Apache (padrão nas hospedagens brasileiras): manda tudo para o SPA.
+writeFileSync(
+  resolve(dist, '.htaccess'),
+  `<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+`
+)
+
+console.log(`pos-build: ${rotas.length} rotas pre-renderizadas, sitemap com ${todas.length} URLs, 404.html e .htaccess`)
