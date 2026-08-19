@@ -6,7 +6,7 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  background: var(--creme);
+  background: var(--branco);
   color: var(--grafite);
   font-family: var(--grotesca);
   font-size: var(--t-corpo);
@@ -19,7 +19,7 @@ h1, h2, h3, h4 {
   font-family: var(--serifa);
   font-weight: 600;
   color: var(--azul-900);
-  line-height: 1.12;
+  line-height: 1.1;
   letter-spacing: -0.01em;
   margin: 0;
   text-wrap: balance;
@@ -29,7 +29,7 @@ p { margin: 0; }
 img { max-width: 100%; height: auto; display: block; }
 
 a {
-  color: var(--azul-500);
+  color: var(--azul-600);
   text-decoration-color: var(--linha);
   text-underline-offset: 3px;
   transition: color var(--transicao);
@@ -37,7 +37,7 @@ a {
 a:hover { color: var(--azul-900); }
 
 :focus-visible {
-  outline: 2px solid var(--azul-500);
+  outline: 2px solid var(--azul-600);
   outline-offset: 3px;
 }
 
@@ -73,7 +73,7 @@ button { font: inherit; }
   display: block;
   width: 48px;
   height: 2px;
-  background: var(--acento);
+  background: var(--vermelho);
   margin-bottom: var(--e-3);
 }
 .rotulo-secao span {
@@ -120,9 +120,22 @@ button { font: inherit; }
   position: absolute;
   left: -9999px;
   top: 0;
-  background: var(--azul-700);
-  color: var(--creme);
+  background: var(--azul-800);
+  color: var(--branco);
   padding: var(--e-3) var(--e-4);
   z-index: 100;
 }
 .pular-para-conteudo:focus { left: var(--e-4); top: var(--e-4); }
+
+
+/* --- blocos de tela cheia: a troca de fundo marca a virada de assunto ---- */
+.bloco-escuro {
+  background: var(--azul-800);
+  color: rgba(255, 255, 255, 0.86);
+}
+.bloco-escuro h1, .bloco-escuro h2, .bloco-escuro h3 { color: var(--branco); }
+.bloco-escuro .rotulo-secao span { color: rgba(255, 255, 255, 0.6); }
+.bloco-escuro .rotulo-secao::before { background: var(--vermelho-claro); }
+.bloco-escuro a:not(.botao) { color: var(--branco); }
+
+.bloco-gelo { background: var(--gelo); }

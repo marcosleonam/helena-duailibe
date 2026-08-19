@@ -37,10 +37,11 @@ export default function Inicio() {
       />
 
       {/* Abertura */}
-      <section className="container abertura">
+      <section className="abertura bloco-escuro">
+       <div className="container">
         <div className="grade abertura__grade">
           <div className="abertura__texto" style={{ gridColumn: 'span 7' }}>
-            <p className="data-rotulo abertura__olho">
+            <p className="abertura__olho">
               {perfil.cargo} — Maranhão · {perfil.partido} {perfil.numero}
             </p>
             <h1 className="abertura__titulo">
@@ -52,8 +53,13 @@ export default function Inicio() {
               de gestão para a Assembleia Legislativa.
             </p>
             <div className="abertura__acoes">
-              <Botao para="/atuacao">Conheça a atuação</Botao>
-              <Botao href={perfil.instagram} variante="texto">Instagram →</Botao>
+              <Botao para="/atuacao" variante="claro">Conheça a atuação</Botao>
+              <Botao href={perfil.instagram} variante="texto-claro">Instagram →</Botao>
+            </div>
+
+            <div className="numero">
+              <span className="numero__rotulo">Deputada Estadual</span>
+              <span className="numero__valor">{perfil.numero}</span>
             </div>
           </div>
 
@@ -70,6 +76,7 @@ export default function Inicio() {
             </picture>
           </div>
         </div>
+       </div>
       </section>
 
       {/* Credenciais */}
@@ -131,7 +138,7 @@ export default function Inicio() {
       <Citacao texto={posicionamento.texto} autoria={posicionamento.autoria} />
 
       {/* Instagram */}
-      <section className="container secao" aria-labelledby="titulo-instagram">
+      <section className="secao bloco-gelo" aria-labelledby="titulo-instagram"><div className="container">
         <Revelar>
           <RotuloSecao>Redes</RotuloSecao>
           <div className="secao__cabecalho">
@@ -165,6 +172,7 @@ export default function Inicio() {
           <p className="instagram__arroba">{perfil.arroba}</p>
           <Botao href={perfil.instagram}>Seguir no Instagram</Botao>
         </div>
+       </div>
       </section>
     </>
   )

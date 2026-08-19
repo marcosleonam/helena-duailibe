@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: var(--creme);
+  background: var(--branco);
   border-bottom: 1px solid transparent;
   transition: border-color var(--transicao);
 }
@@ -48,8 +48,8 @@
   border-bottom: 2px solid transparent;
   transition: color var(--transicao), border-color var(--transicao);
 }
-.cabecalho__link:hover { color: var(--azul-700); }
-.cabecalho__link.ativo { color: var(--azul-900); border-bottom-color: var(--acento); }
+.cabecalho__link:hover { color: var(--azul-800); }
+.cabecalho__link.ativo { color: var(--azul-900); border-bottom-color: var(--vermelho); }
 
 .cabecalho__botao-menu {
   display: inline-flex;
@@ -71,7 +71,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: var(--creme);
+  background: var(--branco);
   padding: 120px var(--e-6) var(--e-12);
   flex-direction: column;
   justify-content: space-between;
@@ -90,7 +90,7 @@
   padding-bottom: var(--e-4);
   border-bottom: 1px solid var(--linha);
 }
-.painel__link:hover { color: var(--azul-500); }
+.painel__link:hover { color: var(--azul-600); }
 .painel__instagram {
   font-size: var(--t-meta);
   letter-spacing: 0.08em;

@@ -34,7 +34,7 @@
 .atuacao__lateral { align-self: start; }
 
 .aviso-confirmar {
-  border-left: 2px solid var(--acento);
+  border-left: 2px solid var(--vermelho);
   padding: var(--e-3) var(--e-4);
   background: var(--branco);
   font-size: var(--t-meta);
@@ -57,7 +57,7 @@
   padding: var(--e-3) var(--e-4);
   transition: border-color var(--transicao);
 }
-.campo input:hover, .campo select:hover, .campo textarea:hover { border-color: var(--azul-500); }
+.campo input:hover, .campo select:hover, .campo textarea:hover { border-color: var(--azul-600); }
 .campo textarea { resize: vertical; min-height: 8rem; }
 .campo__erro { font-size: var(--t-meta); color: var(--erro); }
 .campo--invalido input, .campo--invalido select, .campo--invalido textarea { border-color: var(--erro); }

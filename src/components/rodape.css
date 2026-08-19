@@ -19,14 +19,14 @@
 .rodape__nome {
   font-family: var(--serifa);
   font-size: 1.5rem;
-  color: var(--creme);
+  color: var(--branco);
   margin-bottom: var(--e-3);
 }
 .rodape__frase { max-width: 42ch; }
 
 .rodape__lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--e-2); }
 .rodape__lista a { color: rgba(250, 248, 244, 0.85); text-decoration: none; }
-.rodape__lista a:hover { color: var(--creme); text-decoration: underline; }
+.rodape__lista a:hover { color: var(--branco); text-decoration: underline; }
 
 .rodape__legal {
   display: grid;

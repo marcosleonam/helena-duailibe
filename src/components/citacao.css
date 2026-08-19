@@ -1,6 +1,6 @@
 .citacao {
-  background: var(--azul-700);
-  color: var(--creme);
+  background: var(--azul-800);
+  color: var(--branco);
   margin: 0;
   padding-block: var(--e-24);
 }
@@ -23,7 +23,7 @@
   left: -0.05em;
   font-size: 6rem;
   line-height: 1;
-  color: var(--acento);
+  color: var(--vermelho-claro);
   font-style: normal;
 }
 

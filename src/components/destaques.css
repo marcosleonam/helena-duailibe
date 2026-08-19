@@ -9,7 +9,7 @@
 }
 .destaque--principal .destaque__titulo { font-size: var(--t-bloco); }
 .destaque__titulo a { color: var(--azul-900); text-decoration: none; }
-.destaque__titulo a:hover { color: var(--azul-500); }
+.destaque__titulo a:hover { color: var(--azul-600); }
 
 .destaque__resumo { color: var(--grafite); font-size: 1rem; max-width: 60ch; }
 

@@ -1,27 +1,32 @@
 /* ==========================================================================
    Tokens — Dra. Helena Duailibe
-   Cor, tipografia e espaçamento. Nenhum valor solto fora daqui.
+   Paleta amostrada das peças oficiais de campanha (card 10369 e Time da
+   Vitória): azul-marinho #01265B, azul royal #0407AA / #024498, vermelho
+   #CC0607 e branco. Nada de valor solto fora daqui.
    ========================================================================== */
 :root {
   /* --- cor ------------------------------------------------------------- */
-  --azul-900: #071F3D;
-  --azul-700: #0B2E59;
-  --azul-500: #16457F;
-  --azul-100: #E7EDF6;
-  --creme:    #FAF8F4;
+  --azul-900: #011C46;   /* rodapé, textos sobre claro */
+  --azul-800: #01265B;   /* azul institucional das peças */
+  --azul-600: #024498;   /* blocos, botões */
+  --azul-royal: #0407AA; /* faixas de energia */
+  --azul-100: #E8EEF8;   /* fundo alternado */
+  --gelo:     #F2F5FA;   /* fundo de respiro */
   --branco:   #FFFFFF;
-  --acento:   #C9922F;
-  --grafite:  #2A2E35;
-  --cinza-500:#6B7280;
-  --linha:    rgba(11, 46, 89, 0.12);
+  --vermelho: #CC0607;   /* acento — filetes, número, aspas */
+  --vermelho-claro: #FF4D4F; /* acento sobre fundo escuro */
+  --grafite:  #22282F;
+  --cinza-500:#5A6472;
+  --linha:    rgba(1, 38, 91, 0.14);
+  --linha-clara: rgba(255, 255, 255, 0.18);
   --erro:     #B42318;
 
   /* --- tipografia ------------------------------------------------------ */
   --serifa:   "Newsreader", Georgia, "Times New Roman", serif;
   --grotesca: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --t-abertura: clamp(2.5rem, 1.6rem + 3.9vw, 4rem);   /* 40 -> 64 */
-  --t-secao:    clamp(2rem, 1.5rem + 2.2vw, 3rem);     /* 32 -> 48 */
+  --t-abertura: clamp(2.75rem, 1.6rem + 4.6vw, 4.5rem);
+  --t-secao:    clamp(2.125rem, 1.5rem + 2.6vw, 3.25rem);
   --t-bloco:    clamp(1.5rem, 1.3rem + 0.9vw, 1.875rem);
   --t-card:     1.375rem;
   --t-olho:     1.25rem;
