@@ -6,6 +6,7 @@ import Inicio from './pages/Inicio'
 import Biografia from './pages/Biografia'
 import Atuacao from './pages/Atuacao'
 import Destaques from './pages/Destaques'
+import Campanha from './pages/Campanha'
 import DestaqueDetalhe from './pages/DestaqueDetalhe'
 import Imprensa from './pages/Imprensa'
 import Contato from './pages/Contato'
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/" element={<Inicio />} />
           <Route path="/biografia" element={<Biografia />} />
           <Route path="/atuacao" element={<Atuacao />} />
+          <Route path="/campanha" element={<Campanha />} />
           <Route path="/destaques" element={<Destaques />} />
           <Route path="/destaques/:slug" element={<DestaqueDetalhe />} />
           <Route path="/imprensa" element={<Imprensa />} />

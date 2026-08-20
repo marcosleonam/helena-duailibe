@@ -48,6 +48,53 @@ Meta for Developers e o token de longa duração salvo em
 *Settings → Secrets and variables → Actions* como `IG_ACCESS_TOKEN`.
 Se a rotina falhar, uma issue é aberta automaticamente.
 
+### Página "A campanha nas ruas" (`/campanha`)
+
+Vídeos e cards das peças de campanha ficam em `src/content/campanha.js`.
+São duas listas — `videos` e `galeria`. Para publicar material novo:
+
+**Card novo (foto/peça):**
+
+1. Salve a imagem em `public/img/campanha/` — 4/5 (1000×1250 basta), JPEG.
+   Para reduzir: `ffmpeg -i original.jpg -vf scale=1000:-2 -q:v 4 saida.jpg`
+2. Acrescente uma entrada em `galeria`:
+
+```js
+{
+  id: 'carreata-cohab',                      // único
+  imagem: 'img/campanha/carreata-cohab.jpg', // caminho a partir de public/
+  titulo: 'Carreata na Cohab',
+  legenda: 'Uma frase sobre a ação.',
+  permalink: 'https://www.instagram.com/p/XXXX/', // opcional; sem isso vai pro perfil
+}
+```
+
+`destaque: true` põe o filete vermelho na peça-chave — use em uma só.
+
+**Vídeo novo:**
+
+1. Comprima antes de subir (o arquivo vai junto no repositório):
+   `ffmpeg -i original.mp4 -vf scale=540:-2 -c:v libx264 -crf 32 -preset slow \`
+   `  -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 64k -ac 1 public/video/nome.mp4`
+2. Tire o cartaz: `ffmpeg -ss 5 -i public/video/nome.mp4 -frames:v 1 -q:v 3 public/img/campanha/poster-nome.jpg`
+3. Acrescente em `videos`:
+
+```js
+{
+  id: 'nome',
+  titulo: 'Título do vídeo',
+  resumo: 'Duas linhas sobre o que acontece.',
+  data: '2026-08-25',
+  arquivo: 'video/nome.mp4',
+  poster: 'img/campanha/poster-nome.jpg',
+  permalink: perfil.instagram,
+}
+```
+
+O vídeo só é baixado quando a pessoa toca em **Assistir** — antes disso o
+visitante carrega só o cartaz. Com um vídeo só o card fica horizontal; a partir
+de dois, vira grade de colunas. Nada mais precisa ser alterado.
+
 ### Publicar um destaque à mão (sem depender da integração)
 
 Edite `public/data/destaques.json`. Cada item tem esta forma:

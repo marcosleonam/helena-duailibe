@@ -4,12 +4,15 @@ import Revelar from '../components/Revelar'
 import RotuloSecao from '../components/RotuloSecao'
 import Citacao from '../components/Citacao'
 import CardDestaque from '../components/CardDestaque'
+import Videos from '../components/Videos'
+import GaleriaCampanha from '../components/GaleriaCampanha'
 import Botao from '../components/Botao'
 import Fonte from '../components/Fonte'
 import { perfil, posicionamento } from '../content/perfil'
 import { credenciais } from '../content/credenciais'
 import { eixos } from '../content/eixos'
 import { imprensa } from '../content/imprensa'
+import { videos, galeria } from '../content/campanha'
 import { useDestaques, semanaPorExtenso } from '../hooks/useDestaques'
 import './inicio.css'
 import './imprensa.css'
@@ -113,6 +116,38 @@ export default function Inicio() {
           </div>
         </section>
       )}
+
+      {/* A campanha nas ruas — vídeos + cards */}
+      <section className="secao bloco-escuro" aria-labelledby="titulo-campanha">
+       <div className="container">
+        <Revelar>
+          <RotuloSecao>Campanha 2026</RotuloSecao>
+          <div className="secao__cabecalho">
+            <h2 id="titulo-campanha" className="secao__titulo">A campanha nas ruas</h2>
+            <Link className="secao__atalho" to="/campanha">Ver tudo da campanha →</Link>
+          </div>
+        </Revelar>
+
+        {videos.length > 0 && (
+          <div style={{ marginBottom: 'var(--e-24)' }}>
+            <Videos itens={videos} />
+          </div>
+        )}
+
+        <GaleriaCampanha itens={galeria.slice(0, 6)} />
+
+        <div className="chamada-instagram" style={{ marginTop: 'var(--e-16)' }}>
+          <div>
+            <p className="chamada-instagram__titulo">Tem peça nova toda semana</p>
+            <p className="chamada-instagram__texto">
+              As agendas, os bairros visitados e os vídeos completos saem primeiro no perfil oficial
+              {' '}{perfil.arroba}.
+            </p>
+          </div>
+          <Botao href={perfil.instagram} variante="claro">Seguir {perfil.arroba}</Botao>
+        </div>
+       </div>
+      </section>
 
       {/* Eixos */}
       <section className="container secao" aria-labelledby="titulo-eixos">

@@ -17,7 +17,7 @@ const SITE = 'https://marcosleonam.github.io/helena-duailibe'
 const indexHtml = resolve(dist, 'index.html')
 copyFileSync(indexHtml, resolve(dist, '404.html'))
 
-const rotas = ['/biografia', '/atuacao', '/destaques', '/imprensa', '/contato']
+const rotas = ['/biografia', '/atuacao', '/campanha', '/destaques', '/imprensa', '/contato']
 
 const arquivoDestaques = resolve(dist, 'data/destaques.json')
 if (existsSync(arquivoDestaques)) {
