@@ -12,7 +12,7 @@ import { resolve, dirname } from 'node:path'
 
 const raiz = resolve(import.meta.dirname, '..')
 const dist = resolve(raiz, 'dist')
-const SITE = 'https://marcosleonam.github.io/helena-duailibe'
+const SITE = process.env.VITE_SITE_URL ?? 'https://helenaduailibe.com.br'
 
 const indexHtml = resolve(dist, 'index.html')
 copyFileSync(indexHtml, resolve(dist, '404.html'))

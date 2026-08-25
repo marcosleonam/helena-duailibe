@@ -1,6 +1,6 @@
 import { perfil } from '../content/perfil'
 
-const BASE_URL = 'https://marcosleonam.github.io/helena-duailibe'
+const BASE_URL = 'https://helenaduailibe.com.br'
 
 /**
  * Metadados por página. O React 19 iça title/meta/link para o <head>

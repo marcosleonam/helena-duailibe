@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://marcosleonam.github.io/helena-duailibe/sitemap.xml
+Sitemap: https://helenaduailibe.com.br/sitemap.xml

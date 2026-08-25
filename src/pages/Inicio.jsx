@@ -25,7 +25,7 @@ const jsonLd = {
   jobTitle: `${perfil.cargo} — ${perfil.casa}`,
   affiliation: { '@type': 'Organization', name: perfil.casa },
   memberOf: { '@type': 'PoliticalParty', name: perfil.partido },
-  url: 'https://marcosleonam.github.io/helena-duailibe/',
+  url: 'https://helenaduailibe.com.br/',
   sameAs: [perfil.instagram, perfil.paginaAlema],
 }
 
