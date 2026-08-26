@@ -1,0 +1,30 @@
+/* --- grade das publicações do Instagram ----------------------------------
+   Reaproveita .galeria/.cartao (mesmo cartão das peças de campanha) e só
+   acrescenta o que é próprio do feed: mais colunas, a marca de Reels/Carrossel
+   e o botão de "ver mais".                                                  */
+
+@media (min-width: 64rem) {
+  .posts-ig { grid-template-columns: repeat(4, 1fr); }
+}
+
+.posts-ig .cartao__texto { gap: var(--e-1); }
+
+.posts-ig__marca {
+  position: absolute;
+  top: var(--e-2);
+  right: var(--e-2);
+  padding: 0.15rem 0.5rem;
+  font-size: var(--t-rotulo);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--branco);
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(2px);
+}
+
+.posts-ig__mais {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--e-12);
+}

@@ -2,12 +2,17 @@ import Seo from '../components/Seo'
 import RotuloSecao from '../components/RotuloSecao'
 import Videos from '../components/Videos'
 import GaleriaCampanha from '../components/GaleriaCampanha'
+import PostsInstagram from '../components/PostsInstagram'
 import Botao from '../components/Botao'
 import { perfil } from '../content/perfil'
 import { videos, galeria } from '../content/campanha'
+import { useInstagram } from '../hooks/useInstagram'
+import { dataPorExtenso } from '../hooks/useDestaques'
 import './pagina.css'
 
 export default function Campanha() {
+  const { itens: posts, atualizadoEm } = useInstagram()
+
   return (
     <>
       <Seo
@@ -44,6 +49,21 @@ export default function Campanha() {
           </h2>
           <GaleriaCampanha itens={galeria} />
         </section>
+
+        {posts.length > 0 && (
+          <section aria-labelledby="titulo-instagram" style={{ marginTop: 'var(--e-24)' }}>
+            <RotuloSecao>Direto do perfil oficial</RotuloSecao>
+            <h2 id="titulo-instagram" className="secao__titulo" style={{ marginBottom: 'var(--e-4)' }}>
+              Tudo que saiu no Instagram
+            </h2>
+            <p className="meta" style={{ marginBottom: 'var(--e-12)' }}>
+              {posts.length} publicações
+              {atualizadoEm && ` · atualizado em ${dataPorExtenso(atualizadoEm.slice(0, 10))}`}
+              {' '}· cada card abre a publicação original em {perfil.arroba}
+            </p>
+            <PostsInstagram itens={posts} />
+          </section>
+        )}
 
         <div className="chamada-instagram" style={{ marginTop: 'var(--e-24)' }}>
           <div>
