@@ -1,38 +1,46 @@
 /**
  * Sincroniza as publicações do perfil oficial no Instagram.
  *
- * Gera dois arquivos, a partir da MESMA leitura:
- *   public/data/instagram.json  -> todas as publicações do período (página /campanha)
- *   public/data/destaques.json  -> as mais recentes, agrupadas por semana (/destaques)
- * e baixa a capa de cada post para public/img/instagram/<code>.jpg, porque as
+ * Grava <saida>/data/publicacoes.json com tudo que leu (fonte da verdade) e
+ * chama o editorial.mjs, que deriva daí o instagram.json (/campanha) e o
+ * destaques.json (/destaques) já com a seleção feita no painel /admin.
+ * e baixa a capa de cada post para <saida>/img/instagram/<code>.jpg, porque as
  * URLs do CDN do Instagram expiram em poucos dias — hotlink quebraria o site.
  *
- * Duas fontes, nessa ordem:
- *   1. IG_ACCESS_TOKEN (Graph API oficial) — se o secret existir, é o caminho preferido;
- *   2. endpoint público do perfil — não precisa de token nem de login, é o que
- *      o próprio site do Instagram usa para montar a grade pública.
+ * Três fontes, nessa ordem de preferência:
+ *   1. Graph API do Facebook (FB_ACCESS_TOKEN + IG_BUSINESS_ID) — caminho oficial
+ *      e estável, é o token do Business Manager da campanha. É o que roda na VPS.
+ *   2. IG_ACCESS_TOKEN (Instagram Basic Display) — legado.
+ *   3. endpoint público do perfil — sem token, mas a Meta bloqueia sem aviso.
  *
  * Variáveis:
- *   IG_USUARIO  perfil (padrão: helenaduailibe)
- *   IG_DESDE    só publicações a partir dessa data (padrão: 2026-08-01, início da campanha)
- *   IG_LIMITE   teto de publicações (padrão: 60)
- *   IG_ACCESS_TOKEN  token da Graph API (opcional)
+ *   IG_USUARIO        perfil (padrão: helenaduailibe)
+ *   IG_DESDE          só publicações a partir dessa data (padrão: 2026-08-01)
+ *   IG_LIMITE         teto de publicações (padrão: 60)
+ *   IG_SAIDA          pasta destino (padrão: ./public) — na VPS aponta direto
+ *                     para /var/www/helenaduailibe, então não precisa rebuild
+ *   FB_ACCESS_TOKEN   token do BM (fonte 1)
+ *   IG_BUSINESS_ID    id da conta comercial do Instagram (fonte 1)
+ *   IG_ACCESS_TOKEN   token Basic Display (fonte 2)
  *
  * Em caso de falha o script sai com erro SEM sobrescrever os JSONs — o site
  * continua exibindo a última sincronização boa.
  */
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { aplicarEditorial } from './editorial.mjs'
 
 const USUARIO = process.env.IG_USUARIO ?? 'helenaduailibe'
 const DESDE = Date.parse(`${process.env.IG_DESDE ?? '2026-08-01'}T00:00:00Z`) / 1000
 const LIMITE = Number(process.env.IG_LIMITE ?? 60)
 const TOKEN = process.env.IG_ACCESS_TOKEN
+const FB_TOKEN = process.env.FB_ACCESS_TOKEN
+const IG_ID = process.env.IG_BUSINESS_ID
 
 const raiz = resolve(import.meta.dirname, '..')
-const destinoPosts = resolve(raiz, 'public/data/instagram.json')
-const destinoDestaques = resolve(raiz, 'public/data/destaques.json')
-const destinoImg = resolve(raiz, 'public/img/instagram')
+const saida = resolve(raiz, process.env.IG_SAIDA ?? 'public')
+const destinoBruto = resolve(saida, 'data/publicacoes.json')
+const destinoImg = resolve(saida, 'img/instagram')
 
 const CABECALHOS = {
   'User-Agent':
@@ -176,6 +184,55 @@ async function lerPerfilPublico() {
   })
 }
 
+/**
+ * Graph API do Facebook lendo a conta COMERCIAL do Instagram.
+ *
+ * É a fonte boa: token do Business Manager da campanha, sem raspagem e sem
+ * expirar do nada. Pagina por cursor até cobrir o período pedido.
+ */
+async function lerGraphFacebook() {
+  const campos = [
+    'id', 'shortcode', 'caption', 'media_type', 'media_product_type',
+    'media_url', 'thumbnail_url', 'permalink', 'timestamp',
+    'like_count', 'comments_count',
+  ].join(',')
+
+  const brutos = []
+  let url = `https://graph.facebook.com/v21.0/${IG_ID}/media?fields=${campos}&limit=50&access_token=${FB_TOKEN}`
+
+  for (let pagina = 1; pagina <= 10 && url; pagina++) {
+    const dados = await buscar(url)
+    const itens = dados.data ?? []
+    brutos.push(...itens)
+    const ultimo = itens.at(-1)
+    console.log(`  página ${pagina}: ${itens.length} publicações (até ${(ultimo?.timestamp ?? '').slice(0, 10)})`)
+
+    if (brutos.length >= LIMITE * 2) break
+    if (ultimo && Date.parse(ultimo.timestamp) / 1000 < DESDE) break
+    url = dados.paging?.next ?? null
+    if (url) await dormir(500)
+  }
+
+  return brutos.map((m) => ({
+    id: m.id,
+    // o shortcode é o que monta o link do post; o permalink já vem pronto
+    code: m.shortcode ?? (m.permalink ?? '').split('/').filter(Boolean).at(-1),
+    permalink: m.permalink,
+    legenda: m.caption ?? '',
+    segundos: Math.floor(Date.parse(m.timestamp) / 1000),
+    // vídeo/reel: media_url é o .mp4, a capa é o thumbnail_url
+    capa: m.media_type === 'VIDEO' ? (m.thumbnail_url || m.media_url) : m.media_url,
+    largura: 1080,
+    altura: 1350,
+    tipo:
+      m.media_type === 'CAROUSEL_ALBUM' ? 'CARROSSEL'
+      : m.media_product_type === 'REELS' ? 'REEL'
+      : m.media_type,
+    curtidas: m.like_count ?? null,
+    comentarios: m.comments_count ?? null,
+  }))
+}
+
 /** Graph API oficial — usada só quando existe token configurado. */
 async function lerGraphApi() {
   const campos = 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,shortcode'
@@ -213,8 +270,16 @@ async function renovarToken() {
 // --- principal --------------------------------------------------------------
 
 async function principal() {
-  console.log(`Lendo @${USUARIO} (${TOKEN ? 'Graph API' : 'perfil público'})…`)
-  const brutos = TOKEN ? await lerGraphApi() : await lerPerfilPublico()
+  const fonte =
+    FB_TOKEN && IG_ID ? 'Graph API do Facebook (conta comercial)'
+    : TOKEN ? 'Instagram Basic Display'
+    : 'perfil público'
+  console.log(`Lendo @${USUARIO} via ${fonte}…`)
+
+  const brutos =
+    FB_TOKEN && IG_ID ? await lerGraphFacebook()
+    : TOKEN ? await lerGraphApi()
+    : await lerPerfilPublico()
 
   const recortados = brutos
     .filter((b) => b.code && b.segundos >= DESDE)
@@ -242,7 +307,7 @@ async function principal() {
       semana: semanaISO(bruto.segundos * 1000),
       imagem,
       // é ISSO que liga cada peça à publicação original
-      permalink: `https://www.instagram.com/p/${bruto.code}/`,
+      permalink: bruto.permalink || `https://www.instagram.com/p/${bruto.code}/`,
       tipo: bruto.tipo,
       largura: bruto.largura,
       altura: bruto.altura,
@@ -251,24 +316,27 @@ async function principal() {
   }
 
   const atualizadoEm = new Date().toISOString()
-  writeFileSync(destinoPosts, `${JSON.stringify({ atualizadoEm, itens }, null, 2)}\n`)
-  console.log(`instagram.json: ${itens.length} publicações.`)
+  mkdirSync(resolve(saida, 'data'), { recursive: true })
 
-  // /destaques continua sendo o recorte editorial das últimas semanas
-  const destaques = itens.slice(0, 12)
-  writeFileSync(
-    destinoDestaques,
-    `${JSON.stringify({ atualizadoEm, itens: destaques }, null, 2)}\n`
+  // o robô grava só a fonte da verdade; /campanha e /destaques são derivados
+  // dela pelo editorial.mjs, que também é o que o painel /admin chama.
+  writeFileSync(destinoBruto, `${JSON.stringify({ atualizadoEm, itens }, null, 2)}\n`)
+  console.log(`publicacoes.json: ${itens.length} publicações lidas.`)
+
+  const recorte = aplicarEditorial(saida)
+  console.log(
+    `instagram.json: ${recorte.publicadas} no site` +
+      (recorte.ocultas ? ` (${recorte.ocultas} ocultadas no painel)` : '') +
+      ` | destaques.json: ${recorte.destaques}.`
   )
-  console.log(`destaques.json: ${destaques.length} publicações.`)
 
   await renovarToken()
 }
 
 principal().catch((erro) => {
   console.error('\nSincronização falhou:', erro.message)
-  const anterior = existsSync(destinoPosts)
-    ? JSON.parse(readFileSync(destinoPosts, 'utf8')).itens?.length
+  const anterior = existsSync(destinoBruto)
+    ? JSON.parse(readFileSync(destinoBruto, 'utf8')).itens?.length
     : 0
   console.error(`Nada foi sobrescrito — o site segue com as ${anterior} publicações anteriores.`)
   process.exit(1)

@@ -1,11 +1,13 @@
 import Seo from '../components/Seo'
 import RotuloSecao from '../components/RotuloSecao'
 import Revelar from '../components/Revelar'
-import { imprensa } from '../content/imprensa'
+import { useImprensa } from '../hooks/useImprensa'
 import './pagina.css'
 import './imprensa.css'
 
 export default function Imprensa() {
+  const imprensa = useImprensa()
+
   return (
     <>
       <Seo

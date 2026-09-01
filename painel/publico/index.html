@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel da assessoria — Helena Duailibe</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/admin/painel.css">
+</head>
+<body>
+
+<!-- ENTRADA ---------------------------------------------------------------->
+<main id="tela-entrada" class="entrada" hidden>
+  <form class="cartao-entrada" id="form-entrada">
+    <p class="marca">Helena Duailibe <b>10369</b></p>
+    <h1>Painel da assessoria</h1>
+    <label>Usuário
+      <input name="usuario" autocomplete="username" required autocapitalize="none" spellcheck="false">
+    </label>
+    <label>Senha
+      <input name="senha" type="password" autocomplete="current-password" required>
+    </label>
+    <button class="botao" type="submit">Entrar</button>
+    <p class="aviso" id="erro-entrada" role="alert" hidden></p>
+  </form>
+</main>
+
+<!-- PAINEL ----------------------------------------------------------------->
+<div id="tela-painel" hidden>
+  <header class="topo">
+    <div class="topo__marca">
+      <span class="marca">Helena Duailibe <b>10369</b></span>
+      <strong>Painel da assessoria</strong>
+    </div>
+    <div class="topo__acoes">
+      <a class="link" href="https://helenaduailibe.com.br" target="_blank" rel="noopener">Ver o site ↗</a>
+      <button class="botao botao--fantasma" id="btn-sair">Sair</button>
+    </div>
+  </header>
+
+  <nav class="abas" role="tablist">
+    <button class="aba" role="tab" data-painel="imprensa" aria-selected="true">Na imprensa</button>
+    <button class="aba" role="tab" data-painel="instagram" aria-selected="false">Instagram</button>
+  </nav>
+
+  <!-- ABA: IMPRENSA -->
+  <section class="conteudo" id="painel-imprensa">
+    <div class="explica">
+      <h2>Clipping de imprensa</h2>
+      <p>
+        O que aparece na página <a href="https://helenaduailibe.com.br/imprensa" target="_blank" rel="noopener">Na imprensa</a>.
+        A ordem aqui é a ordem no site — a primeira da lista aparece primeiro.
+        Só entra matéria com link real e veículo identificado.
+      </p>
+    </div>
+
+    <div class="barra">
+      <button class="botao" id="btn-nova-materia">+ Adicionar matéria</button>
+      <button class="botao botao--forte" id="btn-salvar-imprensa">Publicar no site</button>
+      <span class="estado" id="estado-imprensa"></span>
+    </div>
+
+    <ul class="materias" id="lista-materias"></ul>
+  </section>
+
+  <!-- ABA: INSTAGRAM -->
+  <section class="conteudo" id="painel-instagram" hidden>
+    <div class="explica">
+      <h2>Publicações do Instagram</h2>
+      <p>
+        O site lê o perfil <b>@helenaduailibe</b> sozinho, de 2 em 2 horas. Post novo entra
+        no site sem ninguém precisar fazer nada. Aqui você só decide o que <b>não</b> deve
+        aparecer e o que merece ficar em <b>destaque</b> na página inicial.
+      </p>
+    </div>
+
+    <div class="barra">
+      <button class="botao" id="btn-sincronizar">Buscar agora no Instagram</button>
+      <button class="botao botao--forte" id="btn-salvar-editorial">Publicar no site</button>
+      <span class="estado" id="estado-instagram"></span>
+    </div>
+
+    <p class="legenda-ajuda">
+      <b>Destaque</b> = sobe para o topo da página inicial e da aba Destaques.
+      <b>Ocultar</b> = some do site (continua no Instagram, só não aparece aqui).
+    </p>
+
+    <div class="grade" id="grade-posts"></div>
+  </section>
+</div>
+
+<script src="/admin/painel.js" type="module"></script>
+</body>
+</html>

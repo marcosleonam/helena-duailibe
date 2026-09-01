@@ -11,7 +11,7 @@ import Fonte from '../components/Fonte'
 import { perfil, posicionamento } from '../content/perfil'
 import { credenciais } from '../content/credenciais'
 import { eixos } from '../content/eixos'
-import { imprensa } from '../content/imprensa'
+import { useImprensa } from '../hooks/useImprensa'
 import { videos, galeria } from '../content/campanha'
 import { useDestaques, semanaPorExtenso } from '../hooks/useDestaques'
 import './inicio.css'
@@ -32,6 +32,7 @@ const jsonLd = {
 export default function Inicio() {
   const { itens } = useDestaques()
   const recentes = itens.slice(0, 3)
+  const imprensa = useImprensa()
 
   return (
     <>

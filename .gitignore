@@ -1,3 +1,11 @@
 node_modules
 dist
 .DS_Store
+
+# gerados pelo robô de sincronização do Instagram (vivem na VPS, não no repo)
+public/data/publicacoes.json
+public/data/instagram.json
+public/data/destaques.json
+public/data/editorial.json
+public/data/imprensa.json
+public/img/instagram/
