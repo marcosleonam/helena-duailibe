@@ -42,6 +42,9 @@
   <nav class="abas" role="tablist">
     <button class="aba" role="tab" data-painel="imprensa" aria-selected="true">Na imprensa</button>
     <button class="aba" role="tab" data-painel="instagram" aria-selected="false">Instagram</button>
+    <button class="aba" role="tab" data-painel="mensagens" aria-selected="false">
+      Mensagens <span class="contador" id="contador-mensagens" hidden></span>
+    </button>
   </nav>
 
   <!-- ABA: IMPRENSA -->
@@ -87,6 +90,25 @@
     </p>
 
     <div class="grade" id="grade-posts"></div>
+  </section>
+
+  <!-- ABA: MENSAGENS -->
+  <section class="conteudo" id="painel-mensagens" hidden>
+    <div class="explica">
+      <h2>Mensagens do site</h2>
+      <p>
+        O que as pessoas enviam pelo formulário da página
+        <a href="https://helenaduailibe.com.br/contato" target="_blank" rel="noopener">Fale com o gabinete</a>.
+        Responder é por e-mail mesmo: clique no endereço e o seu programa de e-mail abre com a resposta pronta para escrever.
+      </p>
+    </div>
+
+    <div class="barra">
+      <button class="botao" id="btn-atualizar-mensagens">Atualizar</button>
+      <span class="estado" id="estado-mensagens"></span>
+    </div>
+
+    <ul class="mensagens" id="lista-mensagens"></ul>
   </section>
 </div>
 

@@ -42,13 +42,9 @@ export default function Atuacao() {
                 </div>
                 <Fonte texto={eixo.fonte?.texto} url={eixo.fonte?.url} />
               </Revelar>
-              <div className="atuacao__lateral">
-                {eixo.confirmar && (
-                  <p className="aviso-confirmar">
-                    [CONFIRMAR] {eixo.confirmar}
-                  </p>
-                )}
-              </div>
+              {/* `eixo.confirmar` é anotação NOSSA sobre dado ainda não checado.
+                  Fica só no código (e no README) — nunca na tela do eleitor. */}
+              <div className="atuacao__lateral" />
             </li>
           ))}
         </ol>

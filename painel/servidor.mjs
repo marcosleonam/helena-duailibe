@@ -5,7 +5,8 @@
  * sozinha, sem mexer em código nem no GitHub:
  *   • clipping de imprensa (antes era o arquivo src/content/imprensa.js)
  *   • quais publicações do Instagram aparecem no site e quais ficam fixadas
- *   • botão para buscar o Instagram na hora, sem esperar o robô das 2h
+ *   • botão para buscar o Instagram na hora, sem esperar o robô diário
+ *   • as mensagens do formulário de contato do site
  *
  * Escuta só em 127.0.0.1; quem expõe para a internet é o nginx, em /admin e
  * /api/, já sob o certificado do domínio.
@@ -18,10 +19,10 @@
  * guarda o hash da senha e o segredo de sessão).
  */
 import { createServer } from 'node:http'
-import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs'
 import { resolve, extname, normalize } from 'node:path'
 import { spawn } from 'node:child_process'
-import { scryptSync, createHmac, timingSafeEqual } from 'node:crypto'
+import { randomUUID, scryptSync, createHmac, timingSafeEqual } from 'node:crypto'
 import { aplicarEditorial, lerJson } from '../scripts/editorial.mjs'
 
 const CONFIG = process.env.PAINEL_CONFIG ?? '/etc/helena-painel/config.json'
@@ -30,6 +31,10 @@ const cfg = JSON.parse(readFileSync(CONFIG, 'utf8'))
 const PORTA = cfg.porta ?? 8790
 const RAIZ_SITE = cfg.raizSite ?? '/var/www/helenaduailibe'
 const PASTA_DADOS = resolve(RAIZ_SITE, 'data')
+// Mensagens do formulário NÃO podem morar em RAIZ_SITE: aquela pasta é servida
+// pelo nginx, e o arquivo viraria uma lista pública de nome, e-mail e cidade
+// de quem escreveu para a deputada.
+const PASTA_PRIVADA = cfg.pastaPrivada ?? '/var/lib/helena-painel'
 const PUBLICO = resolve(import.meta.dirname, 'publico')
 const VALIDADE_SESSAO = 12 * 60 * 60 * 1000 // 12h
 
@@ -71,22 +76,30 @@ function lerSessao(cookie = '') {
   return usuario
 }
 
-// Freio de força bruta: 5 erros por IP a cada 15 min.
-const tentativas = new Map()
-function podeTentar(ip) {
-  const agora = Date.now()
-  const registro = tentativas.get(ip)
-  if (!registro || agora - registro.desde > 15 * 60 * 1000) {
-    tentativas.set(ip, { desde: agora, erros: 0 })
-    return true
+/** Contador por IP com janela deslizante. Serve ao login e ao formulário. */
+function criarFreio(teto, janelaMs) {
+  const mapa = new Map()
+  return {
+    permite(ip) {
+      const registro = mapa.get(ip)
+      if (!registro || Date.now() - registro.desde > janelaMs) {
+        mapa.set(ip, { desde: Date.now(), contagem: 0 })
+        return true
+      }
+      return registro.contagem < teto
+    },
+    conta(ip) {
+      const registro = mapa.get(ip) ?? { desde: Date.now(), contagem: 0 }
+      registro.contagem += 1
+      mapa.set(ip, registro)
+    },
+    limpa: (ip) => mapa.delete(ip),
   }
-  return registro.erros < 5
 }
-function marcarErro(ip) {
-  const registro = tentativas.get(ip) ?? { desde: Date.now(), erros: 0 }
-  registro.erros += 1
-  tentativas.set(ip, registro)
-}
+
+// 5 senhas erradas por IP a cada 15 min; 5 mensagens por IP por hora.
+const freioSenha = criarFreio(5, 15 * 60 * 1000)
+const freioContato = criarFreio(5, 60 * 60 * 1000)
 
 // --- utilidades HTTP --------------------------------------------------------
 
@@ -158,6 +171,43 @@ function limparImprensa(lista) {
   })
 }
 
+// --- mensagens do formulário de contato -------------------------------------
+
+const arquivoMensagens = () => resolve(PASTA_PRIVADA, 'mensagens.json')
+const TETO_MENSAGENS = 500
+
+function lerMensagens() {
+  return lerJson(arquivoMensagens(), { itens: [] }).itens ?? []
+}
+
+function gravarMensagens(itens) {
+  mkdirSync(PASTA_PRIVADA, { recursive: true })
+  writeFileSync(arquivoMensagens(), `${JSON.stringify({ itens }, null, 2)}\n`)
+}
+
+const texto = (valor, max) => String(valor ?? '').trim().slice(0, max)
+
+/** Valida o que veio do formulário público. Nada entra cru no arquivo. */
+function limparMensagem(corpo) {
+  const nome = texto(corpo.nome, 120)
+  const email = texto(corpo.email, 160)
+  const cidade = texto(corpo.cidade, 120)
+  const mensagem = texto(corpo.mensagem, 4000)
+
+  if (nome.length < 2) throw new Error('Informe seu nome.')
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Informe um e-mail válido.')
+  if (cidade.length < 2) throw new Error('Informe sua cidade.')
+  if (mensagem.length < 10) throw new Error('Escreva pelo menos uma frase.')
+
+  return {
+    id: randomUUID(),
+    recebidaEm: new Date().toISOString(),
+    lida: false,
+    nome, email, cidade, mensagem,
+    assunto: texto(corpo.assunto, 60) || 'Outro',
+  }
+}
+
 function limparEditorial(dados, codigosValidos) {
   const filtrar = (lista) =>
     [...new Set((Array.isArray(lista) ? lista : []).map(String))]
@@ -203,18 +253,31 @@ const servidor = createServer(async (req, res) => {
   try {
     // --- login (única rota pública além dos estáticos) ---
     if (rota === '/api/entrar' && req.method === 'POST') {
-      if (!podeTentar(ip)) {
+      if (!freioSenha.permite(ip)) {
         return responder(res, 429, { erro: 'Muitas tentativas. Espere 15 minutos.' })
       }
       const { usuario, senha } = await lerCorpo(req)
       if (!usuario || !senha || !conferirSenha(String(usuario), String(senha))) {
-        marcarErro(ip)
+        freioSenha.conta(ip)
         return responder(res, 401, { erro: 'Usuário ou senha incorretos.' })
       }
-      tentativas.delete(ip)
+      freioSenha.limpa(ip)
       const cookie = `painel=${encodeURIComponent(assinarSessao(String(usuario)))}` +
         `; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${VALIDADE_SESSAO / 1000}`
       return responder(res, 200, { usuario }, { 'Set-Cookie': cookie })
+    }
+
+    // --- formulário de contato do site: público, por definição ---
+    if (rota === '/api/contato' && req.method === 'POST') {
+      const corpo = await lerCorpo(req, 100_000)
+      if (corpo.mel) return responder(res, 200, { ok: true }) // isca de robô: finge que foi
+      if (!freioContato.permite(ip)) {
+        return responder(res, 429, { erro: 'Você já enviou várias mensagens. Tente mais tarde.' })
+      }
+      const mensagem = limparMensagem(corpo)
+      gravarMensagens([mensagem, ...lerMensagens()].slice(0, TETO_MENSAGENS))
+      freioContato.conta(ip)
+      return responder(res, 200, { ok: true })
     }
 
     if (rota === '/api/sair' && req.method === 'POST') {
@@ -264,6 +327,23 @@ const servidor = createServer(async (req, res) => {
           ...editorial,
           mensagem: `${recorte.publicadas} publicações no site, ${recorte.destaques} em destaque.`,
         })
+      }
+
+      if (rota === '/api/mensagens') {
+        if (req.method === 'GET') {
+          const itens = lerMensagens()
+          return responder(res, 200, { itens, naoLidas: itens.filter((m) => !m.lida).length })
+        }
+        // marcar como lida / apagar, sempre por id
+        if (req.method === 'PUT') {
+          const { id, acao } = await lerCorpo(req)
+          let itens = lerMensagens()
+          if (!itens.some((m) => m.id === id)) return responder(res, 404, { erro: 'mensagem não encontrada' })
+          if (acao === 'apagar') itens = itens.filter((m) => m.id !== id)
+          else itens = itens.map((m) => (m.id === id ? { ...m, lida: acao !== 'nao-lida' } : m))
+          gravarMensagens(itens)
+          return responder(res, 200, { itens, naoLidas: itens.filter((m) => !m.lida).length })
+        }
       }
 
       if (rota === '/api/sincronizar' && req.method === 'POST') {

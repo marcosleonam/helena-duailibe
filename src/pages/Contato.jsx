@@ -5,10 +5,11 @@ import Botao from '../components/Botao'
 import { perfil } from '../content/perfil'
 import './pagina.css'
 
-// [CONFIRMAR] Endpoint do formulário (Formspree ou Web3Forms).
-// Enquanto estiver vazio, o formulário orienta o contato por e-mail —
-// nunca finge que enviou.
-const ENDPOINT = ''
+// O envio vai para o nosso próprio painel (painel/servidor.mjs), e a
+// assessoria lê as mensagens na aba "Mensagens" de /admin. Escolhido no lugar
+// de Formspree/Web3Forms porque gasto de campanha tem que sair da conta
+// eleitoral — e isto aqui não custa nada nem depende de terceiro.
+const ENDPOINT = '/api/contato'
 
 const ASSUNTOS = ['Saúde', 'Assistência Social', 'Sugestão de projeto', 'Agenda', 'Outro']
 
@@ -134,25 +135,32 @@ export default function Contato() {
 
               <p className="form__estado" role="status" aria-live="polite">
                 {estado === 'ok' && 'Mensagem recebida. Retornaremos pelo e-mail informado.'}
-                {estado === 'erro' && !ENDPOINT && '[CONFIRMAR] O envio do formulário ainda não foi ligado. Enquanto isso, escreva para o e-mail do gabinete.'}
-                {estado === 'erro' && ENDPOINT && 'Não foi possível enviar agora. Tente novamente ou escreva para o e-mail do gabinete.'}
+                {estado === 'erro' && `Não foi possível enviar agora. Tente novamente ou escreva para ${perfil.gabinete.email}.`}
               </p>
             </form>
           </div>
 
           <div className="contato__lateral" style={{ gridColumn: '9 / span 4' }}>
-            <dl className="contato__bloco">
-              <dt>Gabinete</dt>
-              <dd>{perfil.gabinete.endereco}</dd>
-            </dl>
-            <dl className="contato__bloco">
-              <dt>Telefone</dt>
-              <dd>{perfil.gabinete.telefone}</dd>
-            </dl>
-            <dl className="contato__bloco">
-              <dt>E-mail</dt>
-              <dd>{perfil.gabinete.email}</dd>
-            </dl>
+            {/* bloco de dado que ainda não veio da assessoria simplesmente
+                não aparece — melhor faltar do que exibir marcação interna */}
+            {perfil.gabinete.endereco && (
+              <dl className="contato__bloco">
+                <dt>Gabinete</dt>
+                <dd>{perfil.gabinete.endereco}</dd>
+              </dl>
+            )}
+            {perfil.gabinete.telefone && (
+              <dl className="contato__bloco">
+                <dt>Telefone</dt>
+                <dd>{perfil.gabinete.telefone}</dd>
+              </dl>
+            )}
+            {perfil.gabinete.email && (
+              <dl className="contato__bloco">
+                <dt>E-mail</dt>
+                <dd><a href={`mailto:${perfil.gabinete.email}`}>{perfil.gabinete.email}</a></dd>
+              </dl>
+            )}
             <dl className="contato__bloco">
               <dt>Redes</dt>
               <dd>

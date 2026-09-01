@@ -64,6 +64,7 @@ function mostrarPainel() {
   $('#tela-painel').hidden = false
   carregarImprensa()
   carregarInstagram()
+  carregarMensagens()
 }
 
 $('#form-entrada').addEventListener('submit', async (e) => {
@@ -312,6 +313,90 @@ $('#btn-salvar-editorial').addEventListener('click', (e) =>
     } catch (erro) {
       avisar('#estado-instagram', erro.message, 'erro')
     }
+  })
+)
+
+// --- mensagens do formulário -------------------------------------------------
+
+const quandoPorExtenso = (iso) => {
+  const d = new Date(iso)
+  return d.toLocaleString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+
+function desenharMensagens(itens, naoLidas) {
+  const contador = $('#contador-mensagens')
+  contador.textContent = naoLidas
+  contador.hidden = naoLidas === 0
+
+  const lista = $('#lista-mensagens')
+  lista.replaceChildren()
+
+  if (!itens.length) {
+    lista.append(criar('li', {
+      className: 'vazio',
+      textContent: 'Nenhuma mensagem ainda. O que chegar pelo formulário do site aparece aqui.',
+    }))
+    return
+  }
+
+  for (const m of itens) {
+    const item = criar('li', { className: `mensagem${m.lida ? '' : ' mensagem--nova'}` })
+
+    const topo = criar('div', { className: 'mensagem__topo' })
+    topo.append(
+      criar('span', { className: 'mensagem__nome', textContent: m.nome }),
+      criar('span', { className: 'mensagem__assunto', textContent: m.assunto }),
+      criar('span', { className: 'mensagem__meta', textContent: m.cidade }),
+      criar('span', { className: 'mensagem__quando', textContent: quandoPorExtenso(m.recebidaEm) }),
+    )
+
+    const contato = criar('div', { className: 'mensagem__meta' })
+    // assunto e saudação já prontos: a assessoria só escreve a resposta
+    const resposta = `mailto:${m.email}?subject=${encodeURIComponent(`Re: ${m.assunto} — gabinete da deputada Helena Duailibe`)}`
+    contato.append(criar('a', { className: 'link', href: resposta, textContent: m.email }))
+
+    const acoes = criar('div', { className: 'mensagem__acoes' })
+
+    const marcar = criar('button', {
+      className: 'icone',
+      type: 'button',
+      textContent: m.lida ? 'Marcar como não lida' : 'Marcar como lida',
+    })
+    marcar.addEventListener('click', () => mexerNaMensagem(m.id, m.lida ? 'nao-lida' : 'lida'))
+
+    const apagar = criar('button', { className: 'icone icone--perigo', type: 'button', textContent: 'Apagar' })
+    apagar.addEventListener('click', () => {
+      if (confirm(`Apagar a mensagem de ${m.nome}? Isso não tem volta.`)) mexerNaMensagem(m.id, 'apagar')
+    })
+
+    acoes.append(marcar, apagar)
+    item.append(topo, contato, criar('p', { className: 'mensagem__texto', textContent: m.mensagem }), acoes)
+    lista.append(item)
+  }
+}
+
+async function mexerNaMensagem(id, acao) {
+  try {
+    const dados = await api('mensagens', { method: 'PUT', body: JSON.stringify({ id, acao }) })
+    desenharMensagens(dados.itens, dados.naoLidas)
+  } catch (erro) {
+    avisar('#estado-mensagens', erro.message, 'erro')
+  }
+}
+
+async function carregarMensagens() {
+  try {
+    const dados = await api('mensagens')
+    desenharMensagens(dados.itens, dados.naoLidas)
+  } catch (erro) {
+    avisar('#estado-mensagens', erro.message, 'erro')
+  }
+}
+
+$('#btn-atualizar-mensagens').addEventListener('click', (e) =>
+  comBotaoOcupado(e.currentTarget, 'Atualizando…', async () => {
+    await carregarMensagens()
+    avisar('#estado-mensagens', 'Lista atualizada.')
   })
 )
 

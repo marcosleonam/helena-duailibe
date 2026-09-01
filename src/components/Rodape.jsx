@@ -33,9 +33,11 @@ export default function Rodape() {
           <div>
             <div className="rotulo-secao"><span>Gabinete</span></div>
             <ul className="rodape__lista">
-              <li>{perfil.gabinete.endereco}</li>
-              <li>Telefone: {perfil.gabinete.telefone}</li>
-              <li>E-mail: {perfil.gabinete.email}</li>
+              {perfil.gabinete.endereco && <li>{perfil.gabinete.endereco}</li>}
+              {perfil.gabinete.telefone && <li>Telefone: {perfil.gabinete.telefone}</li>}
+              {perfil.gabinete.email && (
+                <li>E-mail: <a href={`mailto:${perfil.gabinete.email}`}>{perfil.gabinete.email}</a></li>
+              )}
               <li>
                 <a href={perfil.instagram} target="_blank" rel="noopener noreferrer">
                   Instagram {perfil.arroba}
@@ -54,14 +56,12 @@ export default function Rodape() {
 
         <div className="rodape__legal">
           <p>© {ano} {perfil.nome}. {perfil.partido} — {perfil.cargo}, número {perfil.numero}.</p>
-          {perfil.eleitoral.exibir ? (
+          {/* Identificação obrigatória em propaganda eleitoral na internet.
+              Sem ela o site fica irregular perante a Justiça Eleitoral. */}
+          {perfil.eleitoral.exibir && (
             <p>
-              {perfil.eleitoral.responsavel} — CNPJ {perfil.eleitoral.cnpj}
-            </p>
-          ) : (
-            <p className="rodape__reservado">
-              Espaço reservado para a identificação exigida em propaganda eleitoral na internet
-              (responsável e CNPJ de campanha). [CONFIRMAR COM O JURÍDICO DA CAMPANHA]
+              Propaganda eleitoral de responsabilidade de {perfil.eleitoral.responsavel}
+              {' '}— CNPJ {perfil.eleitoral.cnpj}.
             </p>
           )}
         </div>

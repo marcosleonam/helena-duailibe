@@ -13,18 +13,21 @@ export const perfil = {
   arroba: '@helenaduailibe',
   paginaAlema: 'https://www.al.ma.leg.br/sitealema/deputado/dra-helena-duailibe/',
 
-  // [CONFIRMAR] com a assessoria — ver README
+  // Campo vazio NÃO é exibido no site. Nunca colocar texto do tipo
+  // "[CONFIRMAR]" aqui: isso vaza anotação interna para o eleitor.
+  // Endereço e telefone seguem pendentes com a assessoria (ver README).
   gabinete: {
-    endereco: '[CONFIRMAR] Endereço do gabinete na Assembleia Legislativa do Maranhão',
-    telefone: '[CONFIRMAR]',
-    email: '[CONFIRMAR] e-mail institucional do gabinete',
+    endereco: '',
+    telefone: '',
+    email: 'contato@helenaduailibe.com.br',
     whatsapp: '', // vazio = botão de WhatsApp não é exibido
   },
 
-  // Espaço reservado para a identificação exigida em propaganda eleitoral.
-  // [CONFIRMAR COM O JURÍDICO DA CAMPANHA] antes de exibir.
+  // Identificação exigida em propaganda eleitoral na internet
+  // (Lei 9.504/97, art. 57-B e Res. TSE 23.610/2019). Responsável = o nome do
+  // rótulo eleitoral aprovado pela Meta; CNPJ = o da campanha, conforme cartão.
   eleitoral: {
-    exibir: false,
+    exibir: true,
     responsavel: 'ELEIÇÃO 2026 HELENA MARIA DUAILIBE FERREIRA DEPUTADO ESTADUAL',
     cnpj: '68.345.272/0001-67',
   },

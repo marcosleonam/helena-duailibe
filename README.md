@@ -41,7 +41,8 @@ Depois: `npm run build`, subir o conteúdo de `dist/` na hospedagem e conferir
 O site **não chama a API do Instagram pelo navegador** — isso exporia o token no
 código-fonte. Quem lê o Instagram é um robô na VPS:
 
-1. O timer `helena-instagram.timer` dispara de 2 em 2 horas (e 5 min após o boot).
+1. O timer `helena-instagram.timer` dispara **uma vez por dia, 07h de Brasília**
+   (10h UTC). Fora disso, o botão "Buscar agora" do painel resolve na hora.
 2. Ele roda `scripts/sync-instagram.mjs`, que lê o perfil pela **Graph API do
    Facebook** (conta comercial `17841401623695064` + token do BM da campanha),
    baixa a capa de cada post para `img/instagram/` (as URLs da Meta expiram em
@@ -51,7 +52,7 @@ código-fonte. Quem lê o Instagram é um robô na VPS:
    (`/destaques` e a home), já aplicando a seleção feita no painel.
 4. O site lê só esses JSONs. Sem chave no navegador, sem CORS.
 
-Publicou no Instagram? Em no máximo 2h está no site. Sem rebuild, sem deploy —
+Publicou no Instagram? No dia seguinte de manhã está no site (ou na hora, pelo botão do painel). Sem rebuild, sem deploy —
 o nginx serve `/data/` com `Cache-Control: no-store`.
 
 ```bash
@@ -72,6 +73,7 @@ em código nem no GitHub:
 - **Na imprensa** — adicionar, reordenar e remover matérias do clipping.
 - **Instagram** — ocultar publicação que não deve aparecer no site, marcar
   destaque (sobe para o topo da home), e "buscar agora" sem esperar o robô.
+- **Mensagens** — o que chega pelo formulário de contato do site.
 
 Nada vai para o ar sem clicar em **Publicar no site**.
 
@@ -104,6 +106,12 @@ e barrado no `robots.txt`.
 **Onde os dados moram:** `/var/www/helenaduailibe/data/` — `imprensa.json`,
 `editorial.json` (`{ocultos, fixados}`), `publicacoes.json` e os dois derivados.
 São arquivos JSON comuns; dá para editar à mão no servidor em caso de aperto.
+
+**Menos as mensagens do formulário**, que ficam em `/var/lib/helena-painel/`
+(modo 700). Aquela pasta `data/` é servida pelo nginx — guardar mensagens ali
+publicaria nome, e-mail e cidade de quem escreveu para a deputada. `POST
+/api/contato` é a única rota pública da API: tem isca de robô (honeypot),
+validação de todos os campos e teto de 5 mensagens por IP por hora.
 
 ### Página "A campanha nas ruas" (`/campanha`)
 
@@ -197,22 +205,26 @@ o site mostra `[CONFIRMAR]` ou omite o elemento.
 
 - [ ] **Fotos oficiais em alta**: 1 retrato 4:5 e 3 fotos de atuação em 3:2
       (agenda, unidade de saúde, tribuna). Hoje há apenas um retrato.
-- [ ] **Gabinete**: endereço na Assembleia, telefone e e-mail institucional
-      (`src/content/perfil.js` → `gabinete`).
+- [ ] **Gabinete**: endereço na Assembleia e telefone (`src/content/perfil.js`
+      → `gabinete`). O e-mail já está resolvido: `contato@helenaduailibe.com.br`.
+      Campo vazio simplesmente não é exibido — **nunca** escrever `[CONFIRMAR]`
+      ali, isso ia parar na tela do eleitor.
 - [ ] **WhatsApp** de atendimento, se houver (deixe vazio para não exibir o botão).
-- [ ] **Eixo 2** — número do PL do Cadastro Estadual de Motoristas Envolvidos em
+- [ ] **Eixo 2** (anotação interna, não aparece mais no site) — número do PL do Cadastro Estadual de Motoristas Envolvidos em
       Crimes de Trânsito e situação atual da tramitação.
-- [ ] **Eixo 3** — autoria da ferramenta eletrônica de avaliação de risco de
+- [ ] **Eixo 3** (idem) — autoria da ferramenta eletrônica de avaliação de risco de
       violência contra a mulher aprovada na ALEMA. **Não publicar sem confirmação
       do gabinete**: as buscas associaram o tema a outros parlamentares.
 - [x] ~~**Clipping de imprensa**~~: resolvido pelo painel `/admin` — a assessoria
       publica sozinha, sem GitHub e sem código.
-- [ ] **Formulário de contato**: criar o endpoint no Formspree ou Web3Forms e
-      colar em `ENDPOINT`, no topo de `src/pages/Contato.jsx`. Enquanto estiver
-      vazio, o formulário valida os campos e orienta o contato por e-mail em vez
-      de fingir que enviou.
-- [ ] **Identificação eleitoral no rodapé**: `perfil.eleitoral.exibir = true`
-      quando o jurídico da campanha confirmar o texto e o CNPJ.
+- [x] ~~**Formulário de contato**~~: resolvido sem serviço de terceiro — envia
+      para `POST /api/contato` do nosso painel e a assessoria lê na aba
+      *Mensagens*.
+- [x] ~~**Identificação eleitoral no rodapé**~~: ligada em 01/09/2026 com o
+      CNPJ da campanha (68.345.272/0001-67) e o nome do rótulo eleitoral
+      aprovado pela Meta. O jurídico ainda deve revisar a **redação**, mas o
+      site não podia seguir sem a identificação: ela é exigida pela Lei
+      9.504/97, art. 57-B.
 - [ ] **Agenda pública**, se a assessoria quiser uma seção para isso.
 
 ## Decisões técnicas que fogem do óbvio
@@ -222,6 +234,10 @@ o site mostra `[CONFIRMAR]` ou omite o elemento.
   uma dependência a mais e peer dependency presa no React 18.
 - **`BrowserRouter` + `404.html`**, não `HashRouter`: mantém URLs limpas e
   compartilháveis, que é o ponto de ter OG por destaque.
+- **Dado que falta some da tela; não vira `[CONFIRMAR]`.** Durante um tempo o
+  site publicou para o eleitor as nossas próprias anotações de pendência
+  (endereço do gabinete, notas sobre PLs a checar). Placeholder é para o
+  código, nunca para a interface: campo vazio → elemento não renderiza.
 - **Número 10369, não 10.** O 10 é o número do partido; 10369 é o número dela na
   urna para deputada estadual, conforme o cartão do TSE.
 
